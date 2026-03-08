@@ -90,7 +90,7 @@ a close-up selfie taken by herself at a cozy cafe with warm lighting, direct eye
 ## Image Generation
 
 ### Preferred Model: Nano Banana 2 (性价比最高)
-- **API endpoint**: `https://queue.fal.run/fal-ai/nano-banana-2`
+- **API endpoint**: `https://queue.fal.run/fal-ai/qwen-image-2/edit`
 - **Cost**: $0.002/image ( cheapest)
 - **Quality**: Good for most use cases
 
@@ -104,12 +104,12 @@ a close-up selfie taken by herself at a cozy cafe with warm lighting, direct eye
 ```bash
 REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/jeremyhuanggz/clawra@main/assets/clawra.png"
 
-curl -X POST "https://queue.fal.run/fal-ai/nano-banana-2" \
+curl -X POST "https://queue.fal.run/fal-ai/qwen-image-2/edit" \
   -H "Authorization: Key $FAL_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "prompt": "<YOUR_PROMPT>",
-    "image_url": "'"$REFERENCE_IMAGE"'",
+    "image_urls": ["https://cdn.jsdelivr.net/gh/jeremyhuanggz/clawra@main/assets/clawra.png"],
     "num_inference_steps": 30,
     "guidance_scale": 7.5
   }'
@@ -232,7 +232,7 @@ JSON_PAYLOAD=$(jq -n \
   --arg prompt "$EDIT_PROMPT" \
   '{image_url: $image_url, prompt: $prompt, num_inference_steps: 30, guidance_scale: 7.5}')
 
-RESPONSE=$(curl -s -X POST "https://queue.fal.run/fal-ai/nano-banana-2" \
+RESPONSE=$(curl -s -X POST "https://queue.fal.run/fal-ai/qwen-image-2/edit" \
   -H "Authorization: Key $FAL_KEY" \
   -H "Content-Type: application/json" \
   -d "$JSON_PAYLOAD")
@@ -319,7 +319,7 @@ async function editAndSend(
   // Edit reference image with Nano Banana 2
   console.log(`Editing image: "${editPrompt}"`);
 
-  const result = await fal.subscribe("fal-ai/nano-banana-2", {
+  const result = await fal.subscribe("fal-ai/qwen-image-2/edit", {
     input: {
       image_url: REFERENCE_IMAGE,
       prompt: editPrompt,

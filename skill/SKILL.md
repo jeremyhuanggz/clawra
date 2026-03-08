@@ -100,11 +100,11 @@ PROMPT="a close-up selfie taken by herself at <USER_CONTEXT>, direct eye contact
 
 # Build JSON payload with jq (handles escaping properly)
 JSON_PAYLOAD=$(jq -n \
-  --arg image_url "$REFERENCE_IMAGE" \
+  --arg image_urls "$REFERENCE_IMAGE" \
   --arg prompt "$PROMPT" \
-  '{image_url: $image_url, prompt: $prompt, num_images: 1, output_format: "jpeg"}')
+  '{image_urls: $image_urls, prompt: $prompt, num_images: 1, output_format: "jpeg"}')
 
-curl -X POST "https://fal.run/fal-ai/nano-banana-2" \
+curl -X POST "https://fal.run/fal-ai/qwen-image-2/edit" \
   -H "Authorization: Key $FAL_KEY" \
   -H "Content-Type: application/json" \
   -d "$JSON_PAYLOAD"
@@ -202,11 +202,11 @@ echo "Editing reference image with prompt: $EDIT_PROMPT"
 
 # Edit image (using jq for proper JSON escaping)
 JSON_PAYLOAD=$(jq -n \
-  --arg image_url "$REFERENCE_IMAGE" \
+  --arg image_urls "$REFERENCE_IMAGE" \
   --arg prompt "$EDIT_PROMPT" \
-  '{image_url: $image_url, prompt: $prompt, num_images: 1, output_format: "jpeg"}')
+  '{image_urls: $image_urls, prompt: $prompt, num_images: 1, output_format: "jpeg"}')
 
-RESPONSE=$(curl -s -X POST "https://fal.run/fal-ai/nano-banana-2" \
+RESPONSE=$(curl -s -X POST "https://fal.run/fal-ai/qwen-image-2/edit" \
   -H "Authorization: Key $FAL_KEY" \
   -H "Content-Type: application/json" \
   -d "$JSON_PAYLOAD")
@@ -293,9 +293,9 @@ async function editAndSend(
   // Edit reference image with Nano Banana 2
   console.log(`Editing image: "${editPrompt}"`);
 
-  const result = await fal.subscribe("fal-ai/nano-banana-2", {
+  const result = await fal.subscribe("fal-ai/qwen-image-2/edit", {
     input: {
-      image_url: REFERENCE_IMAGE,
+      image_urls: REFERENCE_IMAGE,
       prompt: editPrompt,
       num_images: 1,
       output_format: "jpeg"
@@ -358,7 +358,7 @@ OpenClaw supports sending to:
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `image_url` | string | required | URL of image to edit (fixed in this skill) |
+| `image_urls` | string | required | URL of image to edit (fixed in this skill) |
 | `prompt` | string | required | Edit instruction |
 | `num_images` | 1-4 | 1 | Number of images to generate |
 | `output_format` | enum | "jpeg" | jpeg, png, webp |
