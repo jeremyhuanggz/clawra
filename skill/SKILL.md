@@ -1,12 +1,12 @@
 ---
 name: clawra-selfie
-description: Edit Clawra's reference image with Nano Banana 2 (xAI Aurora) and send selfies to messaging channels via OpenClaw
+description: Edit Clawra's reference image with Nano Banana 2  and send selfies to messaging channels via OpenClaw
 allowed-tools: Bash(npm:*) Bash(npx:*) Bash(openclaw:*) Bash(curl:*) Read Write WebFetch
 ---
 
 # Clawra Selfie
 
-Edit a fixed reference image using xAI's Nano Banana 2 model and distribute it across messaging platforms (WhatsApp, Telegram, Discord, Slack, etc.) via OpenClaw.
+Edit a fixed reference image using Nano Banana 2 model and distribute it across messaging platforms (WhatsApp, Telegram, Discord, Slack, etc.) via OpenClaw.
 
 ## Reference Image
 
