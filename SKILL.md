@@ -1,20 +1,22 @@
 ---
 name: clawra-selfie
-description: Edit Clawra's reference image with Grok Imagine (xAI Aurora) and send selfies to messaging channels via OpenClaw
+description: Edit Clawra's reference image with Nano Banana 2 (FAL) and send selfies to messaging channels via OpenClaw
 allowed-tools: Bash(npm:*) Bash(npx:*) Bash(openclaw:*) Bash(curl:*) Read Write WebFetch
 ---
 
 # Clawra Selfie
 
-Edit a fixed reference image using xAI's Grok Imagine model and distribute it across messaging platforms (WhatsApp, Telegram, Discord, Slack, etc.) via OpenClaw.
+Edit a fixed reference image using FAL's Nano Banana 2 model and distribute it across messaging platforms (WhatsApp, Telegram, Discord, Slack, etc.) via OpenClaw.
 
 ## Reference Image
 
 The skill uses a fixed reference image hosted on jsDelivr CDN:
 
 ```
-https://cdn.jsdelivr.net/gh/SumeLabs/clawra@main/assets/clawra.png
+https://cdn.jsdelivr.net/gh/jeremyhuanggz/clawra@main/assets/clawra.png
 ```
+
+> Note: This replaces the previous SumeLabs/clawra reference. Image is updated as of 2026-03-08.
 
 ## When to Use
 
@@ -85,29 +87,53 @@ a close-up selfie taken by herself at a cozy cafe with warm lighting, direct eye
 | close-up, portrait, face, eyes, smile | `direct` |
 | full-body, mirror, reflection | `mirror` |
 
-### Step 2: Edit Image with Grok Imagine
+## Image Generation
 
-Use the fal.ai API to edit the reference image:
+### Preferred Model: Nano Banana 2 (性价比最高)
+- **API endpoint**: `https://queue.fal.run/fal-ai/nano-banana-2`
+- **Cost**: $0.002/image ( cheapest)
+- **Quality**: Good for most use cases
+
+### Alternative: FLUX Pro (更高质量)
+- **API endpoint**: `https://queue.fal.run/fal-ai/flux-pro/v1.1-ultra`
+- **Cost**: $0.055/image
+- **Use case**: When higher quality is needed
+
+### Prompt Format for Nano Banana 2
 
 ```bash
-REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/SumeLabs/clawra@main/assets/clawra.png"
+REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/jeremyhuanggz/clawra@main/assets/clawra.png"
 
-# Mode 1: Mirror Selfie
-PROMPT="make a pic of this person, but <USER_CONTEXT>. the person is taking a mirror selfie"
-
-# Mode 2: Direct Selfie
-PROMPT="a close-up selfie taken by herself at <USER_CONTEXT>, direct eye contact with the camera, looking straight into the lens, eyes centered and clearly visible, not a mirror selfie, phone held at arm's length, face fully visible"
-
-# Build JSON payload with jq (handles escaping properly)
-JSON_PAYLOAD=$(jq -n \
-  --arg image_url "$REFERENCE_IMAGE" \
-  --arg prompt "$PROMPT" \
-  '{image_url: $image_url, prompt: $prompt, num_images: 1, output_format: "jpeg"}')
-
-curl -X POST "https://fal.run/xai/grok-imagine-image/edit" \
+curl -X POST "https://queue.fal.run/fal-ai/nano-banana-2" \
   -H "Authorization: Key $FAL_KEY" \
   -H "Content-Type: application/json" \
-  -d "$JSON_PAYLOAD"
+  -d '{
+    "prompt": "<YOUR_PROMPT>",
+    "image_url": "'"$REFERENCE_IMAGE"'",
+    "num_inference_steps": 30,
+    "guidance_scale": 7.5
+  }'
+```
+
+### Mode Selection Logic
+
+| Keywords in Request | Auto-Select Mode |
+|---------------------|------------------|
+| outfit, wearing, clothes, dress, suit, fashion | `mirror` |
+| cafe, restaurant, beach, park, city, location | `direct` |
+| close-up, portrait, face, eyes, smile | `direct` |
+| full-body, mirror, reflection | `mirror` |
+
+### Prompt Templates
+
+**Mirror Mode (default for outfits)**:
+```
+make a pic of this person, but <USER_CONTEXT>. the person is taking a mirror selfie
+```
+
+**Direct Mode (for locations/portraits)**:
+```
+a close-up selfie taken by herself at <USER_CONTEXT>, direct eye contact with the camera, looking straight into the lens, eyes centered and clearly visible, not a mirror selfie, phone held at arm's length, face fully visible
 ```
 
 **Response Format:**
@@ -154,7 +180,7 @@ curl -X POST "http://localhost:18789/message" \
 
 ```bash
 #!/bin/bash
-# grok-imagine-edit-send.sh
+# nano-banana-edit-send.sh
 
 # Check required environment variables
 if [ -z "$FAL_KEY" ]; then
@@ -162,13 +188,13 @@ if [ -z "$FAL_KEY" ]; then
   exit 1
 fi
 
-# Fixed reference image
-REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/SumeLabs/clawra@main/assets/clawra.png"
+# Fixed reference image (updated 2026-03-08)
+REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/jeremyhuanggz/clawra@main/assets/clawra.png"
 
 USER_CONTEXT="$1"
 CHANNEL="$2"
 MODE="${3:-auto}"  # mirror, direct, or auto
-CAPTION="${4:-Edited with Grok Imagine}"
+CAPTION="${4:-Edited with Nano Banana 2}"
 
 if [ -z "$USER_CONTEXT" ] || [ -z "$CHANNEL" ]; then
   echo "Usage: $0 <user_context> <channel> [mode] [caption]"
@@ -200,13 +226,13 @@ fi
 echo "Mode: $MODE"
 echo "Editing reference image with prompt: $EDIT_PROMPT"
 
-# Edit image (using jq for proper JSON escaping)
+# Edit image using Nano Banana 2 (cheapest, good quality)
 JSON_PAYLOAD=$(jq -n \
   --arg image_url "$REFERENCE_IMAGE" \
   --arg prompt "$EDIT_PROMPT" \
-  '{image_url: $image_url, prompt: $prompt, num_images: 1, output_format: "jpeg"}')
+  '{image_url: $image_url, prompt: $prompt, num_inference_steps: 30, guidance_scale: 7.5}')
 
-RESPONSE=$(curl -s -X POST "https://fal.run/xai/grok-imagine-image/edit" \
+RESPONSE=$(curl -s -X POST "https://queue.fal.run/fal-ai/nano-banana-2" \
   -H "Authorization: Key $FAL_KEY" \
   -H "Content-Type: application/json" \
   -d "$JSON_PAYLOAD")
@@ -242,7 +268,7 @@ import { promisify } from "util";
 
 const execAsync = promisify(exec);
 
-const REFERENCE_IMAGE = "https://cdn.jsdelivr.net/gh/SumeLabs/clawra@main/assets/clawra.png";
+const REFERENCE_IMAGE = "https://cdn.jsdelivr.net/gh/jeremyhuanggz/clawra@main/assets/clawra.png";
 
 interface GrokImagineResult {
   images: Array<{
@@ -290,23 +316,23 @@ async function editAndSend(
   // Construct the prompt
   const editPrompt = buildPrompt(userContext, actualMode);
 
-  // Edit reference image with Grok Imagine
+  // Edit reference image with Nano Banana 2
   console.log(`Editing image: "${editPrompt}"`);
 
-  const result = await fal.subscribe("xai/grok-imagine-image/edit", {
+  const result = await fal.subscribe("fal-ai/nano-banana-2", {
     input: {
       image_url: REFERENCE_IMAGE,
       prompt: editPrompt,
-      num_images: 1,
-      output_format: "jpeg"
+      num_inference_steps: 30,
+      guidance_scale: 7.5
     }
-  }) as { data: GrokImagineResult };
+  }) as { data: NanoBananaResult };
 
   const imageUrl = result.data.images[0].url;
   console.log(`Edited image URL: ${imageUrl}`);
 
   // Send via OpenClaw
-  const messageCaption = caption || `Edited with Grok Imagine`;
+  const messageCaption = caption || `Edited with Nano Banana 2`;
 
   await execAsync(
     `openclaw message send --action send --channel "${channel}" --message "${messageCaption}" --media "${imageUrl}"`
