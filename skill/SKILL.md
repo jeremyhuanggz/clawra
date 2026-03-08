@@ -1,19 +1,19 @@
 ---
 name: clawra-selfie
-description: Edit Clawra's reference image with Grok Imagine (xAI Aurora) and send selfies to messaging channels via OpenClaw
+description: Edit Clawra's reference image with Nano Banana 2 (xAI Aurora) and send selfies to messaging channels via OpenClaw
 allowed-tools: Bash(npm:*) Bash(npx:*) Bash(openclaw:*) Bash(curl:*) Read Write WebFetch
 ---
 
 # Clawra Selfie
 
-Edit a fixed reference image using xAI's Grok Imagine model and distribute it across messaging platforms (WhatsApp, Telegram, Discord, Slack, etc.) via OpenClaw.
+Edit a fixed reference image using xAI's Nano Banana 2 model and distribute it across messaging platforms (WhatsApp, Telegram, Discord, Slack, etc.) via OpenClaw.
 
 ## Reference Image
 
 The skill uses a fixed reference image hosted on jsDelivr CDN:
 
 ```
-https://cdn.jsdelivr.net/gh/SumeLabs/clawra@main/assets/clawra.png
+https://cdn.jsdelivr.net/gh/jeremyhuanggz/clawra@main/assets/clawra.png
 ```
 
 ## When to Use
@@ -36,7 +36,7 @@ OPENCLAW_GATEWAY_TOKEN=your_token  # From: openclaw doctor --generate-gateway-to
 ### Workflow
 
 1. **Get user prompt** for how to edit the image
-2. **Edit image** via fal.ai Grok Imagine Edit API with fixed reference
+2. **Edit image** via fal.ai Nano Banana 2 Edit API with fixed reference
 3. **Extract image URL** from response
 4. **Send to OpenClaw** with target channel(s)
 
@@ -85,12 +85,12 @@ a close-up selfie taken by herself at a cozy cafe with warm lighting, direct eye
 | close-up, portrait, face, eyes, smile | `direct` |
 | full-body, mirror, reflection | `mirror` |
 
-### Step 2: Edit Image with Grok Imagine
+### Step 2: Edit Image with Nano Banana 2
 
 Use the fal.ai API to edit the reference image:
 
 ```bash
-REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/SumeLabs/clawra@main/assets/clawra.png"
+REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/jeremyhuanggz/clawra@main/assets/clawra.png"
 
 # Mode 1: Mirror Selfie
 PROMPT="make a pic of this person, but <USER_CONTEXT>. the person is taking a mirror selfie"
@@ -104,7 +104,7 @@ JSON_PAYLOAD=$(jq -n \
   --arg prompt "$PROMPT" \
   '{image_url: $image_url, prompt: $prompt, num_images: 1, output_format: "jpeg"}')
 
-curl -X POST "https://fal.run/xai/grok-imagine-image/edit" \
+curl -X POST "https://fal.run/fal-ai/nano-banana-2" \
   -H "Authorization: Key $FAL_KEY" \
   -H "Content-Type: application/json" \
   -d "$JSON_PAYLOAD"
@@ -163,12 +163,12 @@ if [ -z "$FAL_KEY" ]; then
 fi
 
 # Fixed reference image
-REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/SumeLabs/clawra@main/assets/clawra.png"
+REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/jeremyhuanggz/clawra@main/assets/clawra.png"
 
 USER_CONTEXT="$1"
 CHANNEL="$2"
 MODE="${3:-auto}"  # mirror, direct, or auto
-CAPTION="${4:-Edited with Grok Imagine}"
+CAPTION="${4:-Edited with Nano Banana 2}"
 
 if [ -z "$USER_CONTEXT" ] || [ -z "$CHANNEL" ]; then
   echo "Usage: $0 <user_context> <channel> [mode] [caption]"
@@ -206,7 +206,7 @@ JSON_PAYLOAD=$(jq -n \
   --arg prompt "$EDIT_PROMPT" \
   '{image_url: $image_url, prompt: $prompt, num_images: 1, output_format: "jpeg"}')
 
-RESPONSE=$(curl -s -X POST "https://fal.run/xai/grok-imagine-image/edit" \
+RESPONSE=$(curl -s -X POST "https://fal.run/fal-ai/nano-banana-2" \
   -H "Authorization: Key $FAL_KEY" \
   -H "Content-Type: application/json" \
   -d "$JSON_PAYLOAD")
@@ -242,7 +242,7 @@ import { promisify } from "util";
 
 const execAsync = promisify(exec);
 
-const REFERENCE_IMAGE = "https://cdn.jsdelivr.net/gh/SumeLabs/clawra@main/assets/clawra.png";
+const REFERENCE_IMAGE = "https://cdn.jsdelivr.net/gh/jeremyhuanggz/clawra@main/assets/clawra.png";
 
 interface GrokImagineResult {
   images: Array<{
@@ -290,10 +290,10 @@ async function editAndSend(
   // Construct the prompt
   const editPrompt = buildPrompt(userContext, actualMode);
 
-  // Edit reference image with Grok Imagine
+  // Edit reference image with Nano Banana 2
   console.log(`Editing image: "${editPrompt}"`);
 
-  const result = await fal.subscribe("xai/grok-imagine-image/edit", {
+  const result = await fal.subscribe("fal-ai/nano-banana-2", {
     input: {
       image_url: REFERENCE_IMAGE,
       prompt: editPrompt,
@@ -306,7 +306,7 @@ async function editAndSend(
   console.log(`Edited image URL: ${imageUrl}`);
 
   // Send via OpenClaw
-  const messageCaption = caption || `Edited with Grok Imagine`;
+  const messageCaption = caption || `Edited with Nano Banana 2`;
 
   await execAsync(
     `openclaw message send --action send --channel "${channel}" --message "${messageCaption}" --media "${imageUrl}"`
@@ -354,7 +354,7 @@ OpenClaw supports sending to:
 | Signal | Phone number | `+1234567890` |
 | MS Teams | Channel reference | (varies) |
 
-## Grok Imagine Edit Parameters
+## Nano Banana 2 Edit Parameters
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
