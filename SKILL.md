@@ -13,7 +13,7 @@ Edit a fixed reference image using FAL's xAI Grok Imagine model and distribute i
 The skill uses a fixed reference image hosted on jsDelivr CDN:
 
 ```
-https://cdn.jsdelivr.net/gh/jeremyhuanggz/clawra@main/assets/clawra.png
+https://cdn.jsdelivr.net/gh/jeremyhuanggz/clawra@v2/assets/clawra.png
 ```
 
 > Note: This replaces the previous SumeLabs/clawra reference. Image is updated as of 2026-03-08.
@@ -102,14 +102,14 @@ a close-up selfie taken by herself at a cozy cafe with warm lighting, direct eye
 ### Prompt Format for Grok Imagine
 
 ```bash
-REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/jeremyhuanggz/clawra@main/assets/clawra.png"
+REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/jeremyhuanggz/clawra@v2/assets/clawra.png"
 
 curl -X POST "https://fal.run/xai/grok-imagine-image/edit" \
   -H "Authorization: Key $FAL_KEY" \
   -H "Content-Type: application/json" \
   -d '{
     "prompt": "<YOUR_PROMPT>",
-    "image_url": "https://cdn.jsdelivr.net/gh/jeremyhuanggz/clawra@main/assets/clawra.png"
+    "image_url": "https://cdn.jsdelivr.net/gh/jeremyhuanggz/clawra@v2/assets/clawra.png"
   }'
 ```
 
@@ -187,7 +187,7 @@ if [ -z "$FAL_KEY" ]; then
 fi
 
 # Fixed reference image (updated 2026-03-08)
-REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/jeremyhuanggz/clawra@main/assets/clawra.png"
+REFERENCE_IMAGE="https://cdn.jsdelivr.net/gh/jeremyhuanggz/clawra@v2/assets/clawra.png"
 
 USER_CONTEXT="$1"
 CHANNEL="$2"
@@ -266,7 +266,7 @@ import { promisify } from "util";
 
 const execAsync = promisify(exec);
 
-const REFERENCE_IMAGE = "https://cdn.jsdelivr.net/gh/jeremyhuanggz/clawra@main/assets/clawra.png";
+const REFERENCE_IMAGE = "https://cdn.jsdelivr.net/gh/jeremyhuanggz/clawra@v2/assets/clawra.png";
 
 interface GrokImagineResult {
   images: Array<{
